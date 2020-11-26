@@ -1,0 +1,45 @@
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+<h1> Videos </h1>
+<!-- Or if you want a more recent alpha version -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/hls.js@alpha"></script> -->
+<div style="width: 90%; margin: 20px auto; text-align: center; border: 1px solid black;">
+
+  <h2 id="video-errors"></h2>
+  <video width=512 height=512 controls id="video"></video>
+  <script>
+    if (Hls.isSupported()) {
+      var video = document.getElementById('video');
+      var hls = new Hls();
+      // bind them together
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+        console.log("video and hls.js are now bound together !");
+        document.getElementById("video-errors").innerHTML = "HLS Booted"
+        hls.loadSource("http://localhost:9201/live.m3u8");
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+          console.log("manifest loaded, found " + data.levels.length + " quality level");
+           document.getElementById("video-errors").innerHTML = "Manifest Parsed"
+           video.play()
+        });
+      });
+      hls.on(Hls.Events.ERROR, function(event, data) {
+         document.getElementById("video-errors").innerHTML = "Error: " + data.type + " Detail: " + data.details;
+      })
+      hls.on(Hls.Events.NETWORK_ERROR, function() {
+         document.getElementById("video-errors").innerHTML = "Network Error"
+      })
+      hls.on(Hls.Events.MEDIA_ERROR, function() {
+         document.getElementById("video-errors").innerHTML = "Media Error"
+      })
+      hls.on(Hls.Events.OTHER_ERROR, function() {
+         document.getElementById("video-errors").innerHTML = "Other Error"
+      })
+    }
+  </script>
+</div>
+</body>
+</html>
